@@ -1,8 +1,48 @@
-import Image from 'next/image'
+import Link from "next/link";
 
-const Home = () => {
+
+
+type Repository = {
+  id: number;
+  name: string;
+  full_name: string;
+}
+
+type Time = {
+  utc_datetime: string;
+}
+
+
+
+async function getTime(): Promise<Time> {
+  const res = await fetch(
+    "http://worldtimeapi.org/api/timezone/America/Chicago",
+    {
+      next: {
+        revalidate: 5,
+      }
+    }
+  );
+  return res.json();
+}
+
+async function getRepo(): Promise<Repository> {
+  const res = await fetch("https://api.github.com/repos/vercel/next.js");
+  return res.json();
+}
+
+const Home = async () => {
+  
+  const [data, time] = await Promise.all([getRepo(), getTime()]);
   return (
-   <div className='w-full h-full bg-slate-400'>Hello World!</div>
+    <div>
+      <h1>{data.id}</h1>  
+      <h1>{data.name}</h1>  
+      <h1>{data.full_name}</h1>  
+      <h1>{time.utc_datetime}</h1>
+      <Link href="/blog/54">About</Link>
+
+    </div>
   )
 };
 
